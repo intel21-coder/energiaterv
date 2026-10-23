@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EnergiaTerv – felújítási kombinációk</title>
+<style>
+:root{--green:#236b50;--dark:#173d32;--line:#d8e4dd;--bg:#f3f7f4;--muted:#5e7167}
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:var(--bg);color:#18352b;margin:0;padding:16px}
+main{max-width:920px;margin:auto}header{background:var(--dark);color:#fff;padding:24px;border-radius:16px;margin-bottom:16px}
+header h1{margin:8px 0;font-size:clamp(24px,5vw,34px)}header p{margin-bottom:0;line-height:1.5;color:#e2eee8}
+section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin:12px 0}
+h2{font-size:20px;margin:0 0 12px}label{display:block;font-weight:bold;margin:12px 0 6px}
+input,select{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:8px;font-size:16px;background:#fff;color:#18352b}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+button{width:100%;border:0;border-radius:10px;background:var(--green);color:white;font-size:17px;font-weight:bold;padding:14px;margin-top:16px;cursor:pointer}
+button:active{transform:scale(.995)}.small{font-size:13px;color:var(--muted);line-height:1.45}
+#summary{padding:14px;border-radius:10px;background:#eef5f0;margin-bottom:12px;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #e6ede8;vertical-align:top}th{background:#f3f7f4;font-size:12px;color:#53685d}tr.reach{background:#e8f6ed}tr.reach td:first-child{font-weight:bold}
+.tag{display:inline-block;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:bold;background:#fff0d4;color:#745000}.tag.good{background:#d9f1e1;color:#14583d}
+.tablewrap{overflow-x:auto}.rank{font-weight:bold;color:var(--green)}.foot{border-top:1px solid var(--line);padding-top:12px;margin-top:16px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}section{padding:14px}th,td{padding:8px 6px}table{min-width:580px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.85">EnergiaTerv · 2. változat</div>
+<h1>Melyik felújítási kombináció a legolcsóbb?</h1>
+<p>A program végigpróbálja a kiválasztott felújítási intézkedések összes kombinációját, és a becsült beruházási költség szerint rangsorolja őket.</p>
+</header>
+
+<section>
+<h2>1. A ház és a költségbecslés</h2>
+<div class="grid">
+<div><label for="area">Fűtött alapterület (m²)</label><input id="area" type="number" min="30" max="1000" value="140"></div>
+<div><label for="bill">Éves fűtés + melegvíz költsége (Ft)</label><input id="bill" type="number" min="0" step="10000" value="500000"></div>
+<div><label for="wallstate">Falazat szigetelése</label><select id="wallstate"><option value="none">Szigeteletlen (pl. B30 fal)</option><option value="some">Részben / vékonyan szigetelt</option><option value="good">Jól szigetelt</option></select></div>
+<div><label for="atticstate">Padlásfödém / tető</label><select id="atticstate"><option value="none">Nincs vagy minimális szigetelés</option><option value="some">Közepes szigetelés</option><option value="good">Jó szigetelés</option></select></div>
+<div><label for="windowstate">Ablakok</label><select id="windowstate"><option value="old">Régi / gyenge</option><option value="double" selected>Kétrétegű üvegezés</option><option value="triple">Modern háromrétegű</option></select></div>
+<div><label for="heatstate">Fűtés</label><select id="heatstate"><option value="oldgas">Régebbi, kevésbé hatékony gázfűtés</option><option value="gas" selected>Gázkazán</option><option value="heatpump">Hőszivattyú</option><option value="other">Egyéb</option></select></div>
+<div><label for="price">Költségbecslés</label><select id="price"><option value="low">Alsó becslés</option><option value="mid" selected>Középérték</option><option value="high">Felső becslés</option></select></div>
+<div><label for="target">Célmegtakarítás (%)</label><input id="target" type="number" min="1" max="60" value="30"></div>
+</div>
+<div style="margin-top:18px;padding:14px;border:1px solid #d8e4dd;border-radius:10px;background:#f7faf8">
+  <label style="display:flex;align-items:flex-start;gap:10px;margin-top:0">
+    <input id="solar" type="checkbox" style="width:20px;height:20px;flex:0 0 auto;margin-top:1px">
+    <span>Napelem hozzáadása a pénzügyi becsléshez <span class="small" style="font-weight:normal">(a 30%-os felújítási célba nem számít bele)</span></span>
+  </label>
+  <div class="grid">
+    <div><label for="solarCost">Napelem becsült beruházási költsége (Ft)</label><input id="solarCost" type="number" min="0" step="100000" value="3000000"></div>
+    <div><label for="solarSaving">Napelem becsült éves pénzügyi megtakarítása (Ft)</label><input id="solarSaving" type="number" min="0" step="10000" value="250000"></div>
+  </div>
+  <p class="small">A napelem itt külön pénzügyi kiegészítés: a becsült éves forintmegtakarítást hozzáadjuk, a beruházási költséget pedig feltüntetjük. A 30%-os célértéket továbbra is a fűtéshez és épületfelújításhoz kapcsolt becslés alapján vizsgáljuk.</p>
+</div>
+<button type="button" id="run">ÖSSZES KOMBINÁCIÓ KISZÁMÍTÁSA</button>
+<p class="small">A terület és a ház jellemzői a további szakmai modellhez fontosak. Ebben a prototípusban a kombinációs becslés főként a kiválasztott állapotok és az intézkedések szemléltető hatására épül.</p>
+</section>
+
+<section>
+<h2>2. Eredmény és rangsor</h2>
+<div id="summary" aria-live="polite">A számításhoz nyomd meg a fenti gombot.</div>
+<div id="solarSummary" aria-live="polite" style="padding:14px;border:1px solid #d8e4dd;border-radius:10px;margin:0 0 12px;background:#fff">A napelem pénzügyi hatása külön jelenik meg, ha bekapcsolod.</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Helyezés</th><th>Felújítási kombináció</th><th>Becsült megtakarítás</th><th>Becsült költség</th><th>Éves becsült pénzügyi megtakarítás*</th><th>Cél (napelem nélkül)</th></tr></thead>
+<tbody id="rows"><tr><td colspan="6">Még nincs eredmény.</td></tr></tbody>
+</table>
+</div>
+<p class="small foot">* Az éves pénzügyi megtakarítás a megadott fűtési/melegvíz-költség becsült csökkenését és – bekapcsolás esetén – a napelem külön megadott becsült éves megtakarítását együtt mutatja. A napelem itt nem számít bele a 30%-os felújítási célba. Fontos: az értékek csak előzetes, szemléltető becslések. Nem energetikai tanúsítványok, és nem igazolják a támogatási jogosultságot. A tényleges primerenergia-megtakarítást épületre szabott energetikai számítással kell ellenőrizni. A napelem tényleges haszna függ többek között a rendszer méretétől, tájolásától, termelésétől, az önfogyasztástól és az elszámolási feltételektől. A költségeket helyi ajánlatokkal kell pontosítani.</p>
+</section>
+</main>
+<script>
+(function(){
+  var items = [
+    {id:'attic', name:'Padlásfödém-szigetelés', effect:0.17, cost:{low:700000,mid:1100000,high:1500000}, state:'atticstate', good:'good'},
+    {id:'wall', name:'Homlokzati hőszigetelés', effect:0.22, cost:{low:3000000,mid:4500000,high:6000000}, state:'wallstate', good:'good'},
+    {id:'windows', name:'Ablakcsere', effect:0.09, cost:{low:1500000,mid:2750000,high:4000000}, state:'windowstate', good:'triple'},
+    {id:'control', name:'Fűtésszabályozás', effect:0.06, cost:{low:150000,mid:325000,high:500000}},
+    {id:'heating', name:'Fűtési rendszer korszerűsítése', effect:0.12, cost:{low:1800000,mid:3500000,high:6500000}, state:'heatstate', good:'heatpump'}
+  ];
+  function val(id){return document.getElementById(id).value;}
+  function money(n){return Math.round(n).toLocaleString('hu-HU')+' Ft';}
+  function fmtPercent(n){return (n*100).toFixed(1).replace('.',',')+'%';}
+  function estimateBase(){
+    var b=0.90;
+    var year=1989;
+    b += val('wallstate')==='none'?0.12:(val('wallstate')==='some'?0.04:-0.10);
+    b += val('atticstate')==='none'?0.12:(val('atticstate')==='some'?0.04:-0.10);
+    b += val('windowstate')==='old'?0.10:(val('windowstate')==='double'?0.04:-0.08);
+    b += val('heatstate')==='oldgas'?0.08:(val('heatstate')==='heatpump'?-0.12:(val('heatstate')==='other'?0.04:0));
+    return Math.max(0.35,Math.min(1.3,b));
+  }
+  function calculate(){
+    var bill=Math.max(0,Number(val('bill'))||0);
+    var solarOn=document.getElementById('solar').checked;
+    var solarCost=solarOn?Math.max(0,Number(val('solarCost'))||0):0;
+    var solarSaving=solarOn?Math.max(0,Number(val('solarSaving'))||0):0;
+    var tier=val('price');
+    var target=Math.max(1,Math.min(60,Number(val('target'))||30))/100;
+    var base=estimateBase();
+    var available=items.filter(function(it){
+      if(!it.state) return true;
+      return val(it.state)!==it.good;
+    });
+    var results=[];
+    var total=1<<available.length;
+    for(var mask=1;mask<total;mask++){
+      var chosen=[], raw=0, cost=0;
+      for(var i=0;i<available.length;i++){
+        if(mask & (1<<i)){
+          chosen.push(available[i].name);
+          raw += available[i].effect;
+          cost += available[i].cost[tier];
+        }
+      }
+      // Diminishing returns approximates overlap; not a certified energy model.
+      var saving=(1-Math.exp(-raw*0.88))*(base/0.90);
+      saving=Math.max(0,Math.min(0.60,saving));
+      results.push({names:chosen,saving:saving,cost:cost+solarCost,buildingCost:cost,solarCost:solarCost,annual:bill*saving+solarSaving,buildingAnnual:bill*saving,solarAnnual:solarSaving,hit:saving>=target});
+    }
+    results.sort(function(a,b){
+      if(a.hit!==b.hit) return a.hit?-1:1;
+      if(a.cost!==b.cost) return a.cost-b.cost;
+      return b.saving-a.saving;
+    });
+    var hit=results.filter(function(r){return r.hit;});
+    var cheapest=hit.length?hit[0]:results.slice().sort(function(a,b){return b.saving-a.saving || a.cost-b.cost;})[0];
+    var summary=document.getElementById('summary');
+    var solarSummary=document.getElementById('solarSummary');
+    if(solarOn){
+      solarSummary.innerHTML='<b>Napelem külön pénzügyi becslése:</b><br>Beruházási költség: '+money(solarCost)+' · Becsült éves megtakarítás: '+money(solarSaving)+'<br><span class="small">Egyszerű megtérülési becslés: '+(solarSaving>0?(solarCost/solarSaving).toFixed(1).replace('.',',')+' év':'nem számítható, mert az éves megtakarítás 0 Ft')+'. Ez nem tartalmazza a finanszírozást, karbantartást, invertercserét vagy a tarifák változását.</span>';
+    } else {
+      solarSummary.innerHTML='A napelem pénzügyi hatása külön jelenik meg, ha bekapcsolod.';
+    }
+    if(hit.length){
+      summary.innerHTML='<b>Legolcsóbb célértéket elérő becsült kombináció:</b><br>'+cheapest.names.join(' + ')+'<br><b>Teljes becsült költség'+(solarOn?' napelemmel együtt':'')+':</b> '+money(cheapest.cost)+' · <b>Épület/fűtés becsült megtakarítása:</b> '+fmtPercent(cheapest.saving)+'<br><span class="small">A modell becslése szerint '+hit.length+' kombináció éri el a '+fmtPercent(target)+' célértéket. A napelem nem növeli a 30%-os célhoz számított megtakarítást.</span>';
+    } else {
+      summary.innerHTML='<b>A vizsgált kombinációk közül egyik sem éri el a '+fmtPercent(target)+' célértéket ebben a becslésben.</b><br>A legnagyobb becsült megtakarítást adó kombináció: '+cheapest.names.join(' + ')+' · '+fmtPercent(cheapest.saving)+' · teljes becsült költség: '+money(cheapest.cost)+'.';
+    }
+    var rows=document.getElementById('rows');
+    rows.innerHTML='';
+    results.forEach(function(r,index){
+      var tr=document.createElement('tr');
+      if(r.hit) tr.className='reach';
+      function cell(content){var td=document.createElement('td');td.textContent=content;tr.appendChild(td);}
+      cell(String(index+1));
+      cell(r.names.join(' + '));
+      cell(fmtPercent(r.saving));
+      cell(money(r.cost));
+      cell(money(r.annual)+(solarOn?' (ebből napelem: '+money(r.solarAnnual)+')':''));
+      cell(r.hit?'Eléri a célt':'Nem éri el');
+      rows.appendChild(tr);
+    });
+  }
+  document.getElementById('run').addEventListener('click',calculate);
+  calculate();
+})();
+</script>
+</body>
+</html>
