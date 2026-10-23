@@ -1,0 +1,2 @@
+# energiaterv
+Otthoni energiakorszerűsítési kalkulátor
